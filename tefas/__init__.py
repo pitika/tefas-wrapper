@@ -1,3 +1,3 @@
-from .crawler import Crawler
+from .tefas import Tefas
 
-__all__ = ["Crawler"]
+__all__ = ["Tefas"]

@@ -5,13 +5,12 @@ from datetime import datetime, timedelta
 from .constants import *
 
 
-class Crawler:
+class Tefas:
     def __init__(self):
         self.session = requests.Session()
         res = self.session.get(ENDPOINT)
         self.cookies = self.session.cookies.get_dict()
-        self.initial_form_data = {**FORM_DATA, **
-                                  self.__update_session_data(res, SESSION_DATA)}
+        self.initial_form_data = {**FORM_DATA, **self.__update_session_data(res, SESSION_DATA)}
 
     def fetch_from(self, start_date, fund):
         now = datetime.now()

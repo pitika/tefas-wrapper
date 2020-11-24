@@ -1,7 +1,7 @@
-from tefas import Crawler
+from tefas import Tefas
 
 if __name__ == '__main__':
-    tefas = Crawler()
+    tefas = Tefas()
     data_list = tefas.fetch_single(date="22.11.2020", fund="AFT")
     #for data in data_list:
     # print(len(data_list))
