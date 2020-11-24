@@ -18,11 +18,12 @@ class Tefas:
         return self.fetch(start_date, end_date, fund)
 
     def fetch_single(self, date, fund):
-        near_date = self._get_near_weekday(date)
-        return self.fetch(start_date=near_date, end_date=near_date, fund=fund)
+        return self.fetch(start_date=date, end_date=date, fund=fund)
 
     def fetch(self, start_date, end_date, fund):
         # Get first page
+        start_date = self._get_near_weekday(start_date)
+        end_date = self._get_near_weekday(end_date)
         data = self.initial_form_data
         for field in FORM_DATA_START_DATE_FIELDS:
             data[field] = start_date
@@ -35,10 +36,12 @@ class Tefas:
 
         # Get remaining pages
         first_page = self.__get_first_page(data)
-        first_page = self.__parse_table(first_page.text, HTML_TABLE_IDS[0])
-        next_pages = self.__get_next_pages(data)
-        next_pages = self.__parse_table(next_pages.text, HTML_TABLE_IDS[0])
-        return [*first_page, *next_pages]
+        result = self.__parse_table(first_page.text, HTML_TABLE_IDS[0])
+        if(result[len(result)-1]["Tarih"]!=start_date or len(fund)==0):
+            next_pages = self.__get_next_pages(data)
+            result = [*result,*self.__parse_table(next_pages.text, HTML_TABLE_IDS[0])]
+        
+        return result
 
     def __do_post(self, data):
         # TODO: error handling
