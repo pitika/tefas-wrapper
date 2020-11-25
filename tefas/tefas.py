@@ -12,15 +12,7 @@ class Tefas:
         self.cookies = self.session.cookies.get_dict()
         self.initial_form_data = {**FORM_DATA, **self.__update_session_data(res, SESSION_DATA)}
 
-    def fetch_from(self, start_date, fund):
-        now = datetime.now()
-        end_date = now.strftime(DATE_FORMAT)
-        return self.fetch(start_date, end_date, fund)
-
-    def fetch_single(self, date, fund):
-        return self.fetch(start_date=date, end_date=date, fund=fund)
-
-    def fetch(self, start_date, end_date, fund):
+    def fetch(self, fund="", start_date=datetime.now().strftime(DATE_FORMAT), end_date=datetime.now().strftime(DATE_FORMAT)):
         # Get first page
         start_date = self._get_near_weekday(start_date)
         end_date = self._get_near_weekday(end_date)
