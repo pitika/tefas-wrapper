@@ -16,9 +16,9 @@ FORM_DATA = {
     "ctl00$MainContent$ImageButtonGenelNext.y": "",
     "ctl00$MainContent$HiddenFieldFundId": "",
     "ctl00$MainContent$HTarihselFonKod": "",
+    "ctl00$MainContent$RadioButtonListFundMainType": "",
     # fixed data
     "ctl00$MainContent$ButtonSearchDates": "G\xF6r\xFCnt\xFCle",
-    "ctl00$MainContent$RadioButtonListFundMainType": "YAT",
     "ctl00$MainContent$TextBoxOtherFund": "",
     "ctl00$MainContent$TextBoxWatermarkExtenderFund_ClientState": "",
     "ctl00$MainContent$DropDownListExtraFundType": "T\xFCm\xFC",
@@ -34,6 +34,12 @@ FORM_DATA = {
     "ctl00$MainContent$HAllocationSortExpression": "Descending",
     "hiddenInputToUpdateATBuffer_CommonToolkitScripts": "1"
 }
+
+PAGE_SCRIPT_KEY = "ctl00$MainContent$ScriptManager1"
+NEXT_BUTTON_KEY_1 = "ctl00$MainContent$ImageButtonGenelNext.x"
+NEXT_BUTTON_KEY_2 = "ctl00$MainContent$ImageButtonGenelNext.y"
+FIRST_PAGE_SCRIPT = "ctl00$MainContent$UpdatePanel1|ctl00$MainContent$ButtonSearchDates"
+NEXT_PAGES_SCRIPT = "ctl00$MainContent$UpdatePanel1|ctl00$MainContent$ImageButtonGenelNext"
 
 SESSION_DATA = {
     "__EVENTTARGET": "",
@@ -62,6 +68,8 @@ FORM_DATA_FUND_FIELDS = [
     "ctl00$MainContent$HiddenFieldFundId",
     "ctl00$MainContent$HTarihselFonKod"
 ]
+
+FORM_DATA_FUND_TYPE_KEY = "ctl00$MainContent$RadioButtonListFundMainType"
 
 HEADERS = {
     "Connection": "keep-alive",

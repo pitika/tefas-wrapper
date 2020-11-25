@@ -1,8 +1,9 @@
 from wrapper import Tefas
+from wrapper.fund_type import FundType
 
 if __name__ == '__main__':
-    tefas = Tefas()
-    data_list = tefas.fetch("AFT", "25.11.2020", "25.11.2020")
+    tefas = Tefas(FundType.YAT)
+    data_list = tefas.fetch("AFT")
     
     for data in data_list:
         print(data)

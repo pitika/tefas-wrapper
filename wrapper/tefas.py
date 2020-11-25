@@ -3,14 +3,16 @@ from bs4 import BeautifulSoup
 from datetime import datetime, timedelta
 
 from .constants import *
-
+from .fund import Fund
+from .fund_type import FundType
 
 class Tefas:
-    def __init__(self):
+    def __init__(self, fund_type=FundType.YAT):
         self.session = requests.Session()
         res = self.session.get(ENDPOINT)
         self.cookies = self.session.cookies.get_dict()
         self.initial_form_data = {**FORM_DATA, **self.__update_session_data(res, SESSION_DATA)}
+        self.initial_form_data[FORM_DATA_FUND_TYPE_KEY] = fund_type
 
     def fetch(self, fund="", start_date=datetime.now().strftime(DATE_FORMAT), end_date=datetime.now().strftime(DATE_FORMAT)):
         # Get first page
@@ -29,11 +31,11 @@ class Tefas:
         # Get remaining pages
         first_page = self.__get_first_page(data)
         result = self.__parse_table(first_page.text, HTML_TABLE_IDS[0])
-        if(result[len(result)-1]["Tarih"]!=start_date or len(fund)==0):
+        if(result and  (result[len(result)-1]["Tarih"]!=start_date or len(fund)==0)):
             next_pages = self.__get_next_pages(data)
             result = [*result,*self.__parse_table(next_pages.text, HTML_TABLE_IDS[0])]
         
-        return result
+        return [Fund(data) for data in result]
 
     def __do_post(self, data):
         # TODO: error handling
@@ -46,15 +48,13 @@ class Tefas:
         return response
 
     def __get_first_page(self, data):
-        mng = "ctl00$MainContent$UpdatePanel1|ctl00$MainContent$ButtonSearchDates"
-        data["ctl00$MainContent$ScriptManager1"] = mng
+        data[PAGE_SCRIPT_KEY] = FIRST_PAGE_SCRIPT
         return self.__do_post(data)
 
     def __get_next_pages(self, data):
-        mng = "ctl00$MainContent$UpdatePanel1|ctl00$MainContent$ImageButtonGenelNext"
-        data["ctl00$MainContent$ScriptManager1"] = mng
-        data["ctl00$MainContent$ImageButtonGenelNext.x"] = "1"
-        data["ctl00$MainContent$ImageButtonGenelNext.y"] = "1"
+        data[PAGE_SCRIPT_KEY] = NEXT_PAGES_SCRIPT
+        data[NEXT_BUTTON_KEY_1] = "1"
+        data[NEXT_BUTTON_KEY_2] = "1"
         return self.__do_post(data)
 
     def _get_near_weekday(self, date):
