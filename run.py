@@ -6,7 +6,10 @@ if __name__ == '__main__':
     data_list = tefas.fetch("AFT")
     
     for data in data_list:
+        detail = tefas.fetch_detail(data.code)
         print(data)
-    # print(len(data_list))
-    # print(data_list[len(data_list)-1])
-    # print(data_list[0])clear
+        print("-----------------------------")
+        print(detail)
+        print("-----------------------------")
+        print("-----------------------------")
+        print("-----------------------------")

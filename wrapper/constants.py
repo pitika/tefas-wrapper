@@ -1,4 +1,5 @@
 ENDPOINT = "https://www.tefas.gov.tr/TarihselVeriler.aspx"
+ENDPOINT_DETAIL = "https://www.tefas.gov.tr/FonAnaliz.aspx"
 MAX_FETCH = 10000
 DATE_FORMAT = "%d.%m.%Y"
 FORM_DATA = {

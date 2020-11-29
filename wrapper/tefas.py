@@ -1,10 +1,11 @@
 import requests
 from bs4 import BeautifulSoup
+import js2xml
+import re
 from datetime import datetime, timedelta
 
 from .constants import *
-from .fund import Fund
-from .fund_type import FundType
+from .models import Fund, FundType, Detail, Asset
 
 class Tefas:
     def __init__(self, fund_type=FundType.YAT):
@@ -37,6 +38,17 @@ class Tefas:
         
         return [Fund(data) for data in result]
 
+    def fetch_detail(self, fund):
+        response = self.session.get(
+            url=ENDPOINT_DETAIL,
+            params={"FonKod": fund},
+            cookies=self.cookies,
+            headers=HEADERS,
+        )
+
+        return self.__parse_detail(response.text)
+        
+
     def __do_post(self, data):
         # TODO: error handling
         response = self.session.post(
@@ -47,6 +59,32 @@ class Tefas:
         )
         return response
 
+    def __get_asset_allocation(self, bs):
+        assets = []
+        script = bs.find_all("script", text=re.compile("Highcharts.Chart"))[0].contents[0].replace("//<![CDATA[","").replace("//]]>","")
+        data = js2xml.parse(script).xpath('/program/functioncall[2]/arguments/funcexpr/body/assign[@operator="="]/right/new/arguments/object/property[10]/array/object//property[3]')[0]
+        data = js2xml.jsonlike.make_dict(data)[1]
+        for d in data:
+            assets.append(Asset(d[0],d[1]))
+        return assets
+    
+    def __parse_detail(self, content):
+        bs = BeautifulSoup(content, features="html.parser")
+        detail = Detail({
+            "category": bs.find_all(text="Kategorisi")[0].parent.span.contents[0],
+            "rank": bs.find_all(text="Son Bir Yıllık Kategori Derecesi")[0].parent.span.contents[0],
+            "market_share":bs.find_all(text="Pazar Payı")[0].parent.span.contents[0],
+            "isin_code":bs.find_all(text="ISIN Kodu")[0].parent.next_sibling.text,
+            "start_time":bs.find_all(text="TEFAS İşlem Başlangıç Saati")[0].parent.next_sibling.text,
+            "end_time":bs.find_all(text="TEFAS Son İşlem Saati")[0].parent.next_sibling.text,
+            "value_date":bs.find_all(text="Fon Alış Valörü")[0].parent.next_sibling.text,
+            "back_value_date":bs.find_all(text="Fon Satış Valörü")[0].parent.next_sibling.text,
+            "status":bs.find_all(text="TEFAS İşlem Durumu")[0].parent.next_sibling.text,
+            "assets":self.__get_asset_allocation(bs),
+            "kap_url":bs.find_all(text="KAP Bilgi Adresi")[0].parent.get("href")
+        })
+        return detail
+    
     def __get_first_page(self, data):
         data[PAGE_SCRIPT_KEY] = FIRST_PAGE_SCRIPT
         return self.__do_post(data)
