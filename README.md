@@ -6,11 +6,11 @@ Fetch funds data from https://www.tefas.gov.tr
 
 usage:
 
-    from wrapper import Tefas
+    from tefaswrapper import Wrapper, FundType
     
     # ...
     
-    tefas = Tefas()
+    tefas = Wrapper(FundType.YAT)
     # single day
     result = tefas.fetch("AFT", "25.11.2020", "25.11.2020")
     
@@ -26,5 +26,8 @@ usage:
     # latest values of all funds
     result = tefas.fetch()
     
+    # fetch detail a specific fund
+    detail = tefas.fetch_detail("AFT")
+
     # ...
     

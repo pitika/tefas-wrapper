@@ -1,12 +1,15 @@
 from enum import Enum
 
+
 class Base:
     def __repr__(self):
         return str(self.__dict__)
 
+
 class FundType(str, Enum):
     YAT = "YAT"
     EMK = "EMK"
+
 
 class Fund(Base):
     def __init__(self, data):
@@ -15,9 +18,9 @@ class Fund(Base):
         self.name = data["Fon Adı"]
         self.price = data["Fiyat"]
         self.shares = data["TedavüldekiPaySayısı"]
-        self.person= data["KişiSayısı"]
+        self.person = data["KişiSayısı"]
         self.aum = data["Fon Toplam Değer"]
-        
+
 
 class Detail(Base):
     def __init__(self, data):

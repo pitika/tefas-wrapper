@@ -21,10 +21,10 @@ setup(
     url="https://github.com/semudu/tefas-wrapper",
     download_url="https://github.com/semudu/tefas-wrapper/archive/v" + version + ".tar.gz",
     keywords=["TEFAS", "WRAPPER", "FUND", "FON"],
-    install_requires=["requests","beautifulsoup4"],
+    install_requires=["requests","beautifulsoup4","js2xml"],
     packages=["wrapper"],
     include_package_data=True,
-    python_requires=">=3.6",
+    python_requires=">=3.8",
     classifiers=[
         "Development Status :: 5 - Production/Stable",
         # Chose either "3 - Alpha", "4 - Beta" or "5 - Production/Stable" as the current state of your package
