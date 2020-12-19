@@ -37,8 +37,10 @@ FORM_DATA = {
 }
 
 PAGE_SCRIPT_KEY = "ctl00$MainContent$ScriptManager1"
-NEXT_BUTTON_KEY_1 = "ctl00$MainContent$ImageButtonGenelNext.x"
-NEXT_BUTTON_KEY_2 = "ctl00$MainContent$ImageButtonGenelNext.y"
+NEXT_BUTTON_GENEL_KEY_X = "ctl00$MainContent$ImageButtonGenelNext.x"
+NEXT_BUTTON_GENEL_KEY_Y = "ctl00$MainContent$ImageButtonGenelNext.y"
+NEXT_BUTTON_ASSET_KEY_X = "ctl00$MainContent$ImageButtonDagilimNext.x"
+NEXT_BUTTON_ASSET_KEY_Y = "ctl00$MainContent$ImageButtonDagilimNext.y"
 FIRST_PAGE_SCRIPT = "ctl00$MainContent$UpdatePanel1|ctl00$MainContent$ButtonSearchDates"
 NEXT_PAGES_SCRIPT = "ctl00$MainContent$UpdatePanel1|ctl00$MainContent$ImageButtonGenelNext"
 
@@ -53,7 +55,8 @@ SESSION_DATA = {
     "__ASYNCPOST": "",
 }
 
-HTML_TABLE_IDS = ["MainContent_GridViewGenel", "MainContent_GridViewDagilim"]
+GENERAL_TAB = "MainContent_GridViewGenel"
+ASSETS_TAB = "MainContent_GridViewDagilim"
 
 FORM_DATA_START_DATE_FIELDS = [
     "ctl00$MainContent$HTarihselBasTarih",

@@ -20,6 +20,7 @@ class Fund(Base):
         self.shares = data["TedavüldekiPaySayısı"]
         self.person = data["KişiSayısı"]
         self.aum = data["Fon Toplam Değer"]
+        self.assets = data["Portfoy Dagilimi"]
 
 
 class Detail(Base):

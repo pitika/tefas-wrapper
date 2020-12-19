@@ -2,8 +2,10 @@ from tefaswrapper import Wrapper, FundType
 
 if __name__ == '__main__':
     tefas = Wrapper(FundType.YAT)
-    data_list = tefas.fetch("KPC","30.11.2020")
-    
+    data_list = tefas.fetch()
+
+    print(data_list)
+
     # for data in data_list:
     #     detail = tefas.fetch_detail(data.code)
     #     print(data)
@@ -12,7 +14,7 @@ if __name__ == '__main__':
     #     print("-----------------------------")
     #     print("-----------------------------")
     #     print("-----------------------------")
-    detail = tefas.fetch_detail(data_list[0].code)
+    # detail = tefas.fetch_detail(data_list[0].code)
 
     # kap = tefas.fetch_kap(detail.kap_url)
-    print(detail)
+    # print(detail)
