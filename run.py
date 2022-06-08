@@ -2,7 +2,7 @@ from tefaswrapper import Wrapper, FundType
 
 if __name__ == '__main__':
     tefas = Wrapper(FundType.YAT)
-    data_list = tefas.fetch()
+    data_list = tefas.fetch("HMK")
 
     print(data_list)
 
