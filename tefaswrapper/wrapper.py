@@ -3,7 +3,9 @@ import js2xml
 import re
 from bs4 import BeautifulSoup
 from datetime import datetime, timedelta
-from .models import Fund, FundType, Detail, Asset
+from .models import FundType, Asset
+from .schema import History, Fund
+import pandas as pd
 
 
 class Wrapper:
@@ -14,12 +16,19 @@ class Wrapper:
 
     date_format = "%d.%m.%Y"
 
-    def __init__(self, fund_type=FundType.YAT):
+    fund_type = FundType.YAT
+
+    def __init__(self):
         self.session = requests.Session()
         self.session.get(self.root_url)
         self.cookies = self.session.cookies.get_dict()
 
-    def fetch(self, fund="", start_date=datetime.now().strftime(date_format),
+    def set_fund_type(self, fund_type: FundType):
+        self.fund_type = fund_type
+
+    def fetch(self,
+              fund_code="",
+              start_date=datetime.now().strftime(date_format),
               end_date=datetime.now().strftime(date_format)):
 
         # Get first page
@@ -27,56 +36,34 @@ class Wrapper:
         end_date = self._get_near_weekday(end_date)
 
         data = {
-            "fontip": FundType.YAT,
+            "fontip": self.fund_type,
             "bastarih": start_date,
             "bittarih": end_date,
-            "fonkod": fund.upper()
+            "fonkod": fund_code.upper()
         }
 
-        response = self.session.post(
-            url=self.info_api,
-            data=data,
-            cookies=self.cookies
-        )
+        info_resp = self.__do_post(self.info_api, data)
+        alloc_resp = self.__do_post(self.allocation_api, data)
 
-        # data = self.initial_form_data
-        # for field in FORM_DATA_START_DATE_FIELDS:
-        #     data[field] = start_date
-        #
-        # for field in FORM_DATA_END_DATE_FIELDS:
-        #     data[field] = end_date
-        #
-        # for field in FORM_DATA_FUND_FIELDS:
-        #     data[field] = fund
-        #
-        # # Get remaining pages
-        # first_page = self.__get_first_page(data)
-        # first_general_pages = self.__parse_table(first_page.text, GENERAL_TAB)
-        # if first_general_pages and (
-        #         first_general_pages[len(first_general_pages) - 1]["Tarih"] != start_date or len(fund) == 0):
-        #     first_assets_pages = self.__parse_table(first_page.text, ASSETS_TAB)
-        #
-        #     next_general_pages = self.__get_next_pages(data, NEXT_BUTTON_GENEL_KEY_X, NEXT_BUTTON_GENEL_KEY_Y)
-        #     next_assets_pages = self.__get_next_pages(data, NEXT_BUTTON_ASSET_KEY_X, NEXT_BUTTON_ASSET_KEY_Y)
-        #
-        #     parsed_general_pages = self.__parse_table(next_general_pages.text, GENERAL_TAB)
-        #     parsed_assets_pages = self.__parse_table(next_assets_pages.text, ASSETS_TAB)
-        #
-        #     result_general = [*first_general_pages, *parsed_general_pages]
-        #     result_assets = [*first_assets_pages, *parsed_assets_pages]
-        #
-        #     result = []
-        #     for r in result_general:
-        #         r["Portfoy Dagilimi"] = next(({k.replace("(%)", "").strip(): float(v.replace(",", ".")) for k, v in
-        #                                        item.items() if
-        #                                        k not in ["Tarih", "Fon Kodu", "Fon Adı"] and float(
-        #                                            v.replace(",", ".")) > 0} for item in result_assets if
-        #                                       (item["Tarih"] == r["Tarih"] and item["Fon Kodu"] == r["FonKodu"])), None)
-        #         result.append(r)
+        info_df = pd.DataFrame.from_records(info_resp)
+        alloc_df = pd.DataFrame.from_records(alloc_resp)
 
-        # return [Fund(data) for data in result]
+        fund_df = pd.merge(info_df, alloc_df, on=["TARIH", "FONKODU"], suffixes=('', '_drop'))
+        fund_df.drop([col for col in fund_df.columns if 'drop' in col], axis=1, inplace=True)
 
-        return response.json().get("data", {})
+        result = {}
+        for _, row in fund_df.iterrows():
+            fund = result.get(row.get("FONKODU"))
+            if fund is None:
+                detail = self.fetch_detail(row.get("FONKODU"))
+                fund = Fund().load({**row.to_dict(), **detail})
+            else:
+                history = fund.get("history")
+                history.append(History().load(row.to_dict()))
+
+            result[row.get("FONKODU")] = fund
+
+        return result
 
     def fetch_detail(self, fund):
         response = self.session.get(
@@ -86,6 +73,15 @@ class Wrapper:
         )
 
         return self.__parse_detail(response.text)
+
+    def __do_post(self, url, data):
+        response = self.session.post(
+            url=url,
+            data=data,
+            cookies=self.cookies
+        )
+
+        return response.json().get("data", {})
 
     def __get_asset_allocation(self, bs):
         assets = []
@@ -101,7 +97,7 @@ class Wrapper:
 
     def __parse_detail(self, content):
         bs = BeautifulSoup(content, features="html.parser")
-        return Detail({
+        return {
             "category": bs.find_all(text="Kategorisi")[0].parent.span.contents[0],
             "rank": bs.find_all(text="Son Bir Yıllık Kategori Derecesi")[0].parent.span.contents[0],
             "market_share": bs.find_all(text="Pazar Payı")[0].parent.span.contents[0],
@@ -111,9 +107,9 @@ class Wrapper:
             "value_date": bs.find_all(text="Fon Alış Valörü")[0].parent.next_sibling.text,
             "back_value_date": bs.find_all(text="Fon Satış Valörü")[0].parent.next_sibling.text,
             "status": bs.find_all(text="Platform İşlem Durumu")[0].parent.next_sibling.text,
-            "assets": self.__get_asset_allocation(bs),
+            #"assets": self.__get_asset_allocation(bs),
             "kap_url": bs.find_all(text="KAP Bilgi Adresi")[0].parent.get("href")
-        })
+        }
 
     def _get_near_weekday(self, date):
         current_date = datetime.strptime(date, self.date_format)
