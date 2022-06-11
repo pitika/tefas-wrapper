@@ -56,12 +56,10 @@ class Wrapper:
             fund = result.get(row.get("FONKODU"))
             if fund is None:
                 detail = self.fetch_detail(row.get("FONKODU"))
-                fund = Fund().load({**row.to_dict(), **detail})
+                result[row.get("FONKODU")] = Fund().load({**row.to_dict(), **detail})
             else:
                 history = fund.get("history")
                 history.append(History().load(row.to_dict()))
-
-            result[row.get("FONKODU")] = fund
 
         return result
 
@@ -107,7 +105,7 @@ class Wrapper:
             "value_date": bs.find_all(text="Fon Alış Valörü")[0].parent.next_sibling.text,
             "back_value_date": bs.find_all(text="Fon Satış Valörü")[0].parent.next_sibling.text,
             "status": bs.find_all(text="Platform İşlem Durumu")[0].parent.next_sibling.text,
-            #"assets": self.__get_asset_allocation(bs),
+            # "assets": self.__get_asset_allocation(bs),
             "kap_url": bs.find_all(text="KAP Bilgi Adresi")[0].parent.get("href")
         }
 
