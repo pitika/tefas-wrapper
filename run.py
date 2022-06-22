@@ -2,7 +2,7 @@ from tefaswrapper import Wrapper, FundType
 
 if __name__ == '__main__':
     tefas = Wrapper()
-    data_list = tefas.fetch("NNF",start_date="01.06.2022")
+    data_list = tefas.fetch("NNF")
 
     print(data_list)
 

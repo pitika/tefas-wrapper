@@ -21,7 +21,7 @@ setup(
     url="https://github.com/semudu/tefas-wrapper",
     download_url="https://github.com/semudu/tefas-wrapper/archive/v" + version + ".tar.gz",
     keywords=["TEFAS", "WRAPPER", "FUND", "FON"],
-    install_requires=["requests","beautifulsoup4","js2xml"],
+    install_requires=["requests","beautifulsoup4","js2xml","marshmallow","pandas"],
     packages=["tefaswrapper"],
     include_package_data=True,
     python_requires=">=3.8",

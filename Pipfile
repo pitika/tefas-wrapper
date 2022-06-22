@@ -7,7 +7,6 @@ verify_ssl = true
 
 [packages]
 beautifulsoup4 = "*"
-js2xml = "*"
 requests = "*"
 marshmallow = "*"
 pandas = "*"
